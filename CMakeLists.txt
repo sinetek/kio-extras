@@ -111,6 +111,18 @@ set_package_properties(Mtp PROPERTIES DESCRIPTION "the MTP library"
                        PURPOSE "Needed to build the MTP kioslave"
                        )
 
+find_package(IMobileDevice)
+set_package_properties(IMobileDevice PROPERTIES
+                       TYPE OPTIONAL
+                       PURPOSE "Needed to build the AFC (Apple File Conduit) kioslave"
+                      )
+
+find_package(PList)
+set_package_properties(PList PROPERTIES
+                       TYPE OPTIONAL
+                       PURPOSE "Needed to build the AFC (Apple File Conduit) kioslave"
+                      )
+
 check_include_file(utime.h HAVE_UTIME_H)
 
 # ECM's KDECompilerSettings.cmake should take care of enabling supporting on
@@ -202,6 +214,10 @@ endif()
 
 if(SAMBA_FOUND)
     add_subdirectory(smb)
+endif()
+
+if(IMobileDevice_FOUND AND PList_FOUND)
+    add_subdirectory(afc)
 endif()
 
 configure_file (config-runtime.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-runtime.h )
