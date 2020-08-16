@@ -37,8 +37,9 @@
 #include <kfileplacesmodel.h>
 #include <solid/device.h>
 #include <solid/deviceinterface.h>
-#include <ktoolinvocation.h>
 #include <QGuiApplication>
+#include <KIO/ApplicationLauncherJob>
+#include <KIO/CommandLauncherJob>
 
 using namespace KIO;
 
@@ -187,10 +188,13 @@ void BookmarksProtocol::get( const QUrl& url )
   if (path.isEmpty() || path == "/") {
     echoIndex();
   } else if (path == "/config") {
-    KToolInvocation::startServiceByDesktopName("bookmarks", "");
+    auto job = new KIO::CommandLauncherJob(QStringLiteral("kcmshell5"), {QStringLiteral("bookmarks")});
+    job->start();
     echoHead("bookmarks:/");
   } else if (path == "/editbookmarks") {
-    KToolInvocation::kdeinitExec("keditbookmarks");
+      const KService::Ptr keditbookmarks = KService::serviceByDesktopName(QStringLiteral("org.kde.keditbookmarks"));
+      auto job = new KIO::ApplicationLauncherJob(keditbookmarks);
+      job->start();
     echoHead("bookmarks:/");
   } else if (path.indexOf(regexp, 0, &rmatch) >= 0) {
     echoImage(rmatch.captured(1), rmatch.captured(2), QUrlQuery(url).queryItemValue("size"));
